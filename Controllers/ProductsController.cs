@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LjudButikenBackEnd.Domain;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LjudButikenBackEnd.Controllers;
 
@@ -9,9 +10,11 @@ namespace LjudButikenBackEnd.Controllers;
 public class ProductsController : ControllerBase
 {
     [HttpGet]
-    public IEnumerable<Products> GetProducts()
+    public IEnumerable<Product> GetProducts()
 
     {
-
+        
     }
+        
+    
 }
