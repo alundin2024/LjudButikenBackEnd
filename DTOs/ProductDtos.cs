@@ -1,18 +1,35 @@
 namespace LjudButikenBackEnd.DTOs;
 
+using System.ComponentModel.DataAnnotations;
+using LjudButikenBackEnd.Domain;
+
 public record ProductDto
 (
-    int id,
+    int Id,
     string Name,
     string? Description,
     decimal Price,
+    string? Image,
     string UrlSlug
+);
+
+public record ProductCreateDto
+(
+    [property: Required, MinLength(1)] string Name,
+    string? Description,
+    [property: Range(0, double.MaxValue)] decimal Price,
+    string? Image,
+    List<int>? Categories
+);
+
+public static class ProductMappings
+{
+    public static ProductDto ToDto(this Product p) => new(
+        p.Id,
+        p.Name,
+        p.Description,
+        p.Price,
+        p.Image,
+        p.UrlSlug
     );
-    
-    public record ProductCreateDto
-    (
-        string Name,
-        string? Description,
-        decimal Price,
-        List<int> Categories
-        );
+}
