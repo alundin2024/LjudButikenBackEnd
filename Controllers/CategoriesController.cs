@@ -1,9 +1,9 @@
 // csharp
-using System.Linq;
+using System.Globalization;
+using System.Text;
 using LjudButikenBackEnd.Data;
 using LjudButikenBackEnd.Domain;
 using LjudButikenBackEnd.DTOs;
-using LjudButikenBackEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,10 +20,12 @@ public class CategoriesController : ControllerBase
         _db = db;
     }
 
+    // GET /api/categories and GET /api/categories?slug=foo
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories([FromQuery] string? slug)
+    public async Task<ActionResult<IEnumerable<CategoryWithProductsDto>>> GetCategories([FromQuery] string? slug)
     {
-        IQueryable<Category> query = _db.Categories;
+        IQueryable<Category> query = _db.Categories
+            .Include(c => c.Products);
 
         if (!string.IsNullOrWhiteSpace(slug))
         {
@@ -34,10 +36,10 @@ public class CategoriesController : ControllerBase
             .AsNoTracking()
             .ToListAsync();
 
-        return Ok(categories.Select(c => c.ToDto()));
+        return Ok(categories.Select(c => c.ToWithProductsDto()));
     }
 
-    
+    // GET /api/categories/{id}
     [HttpGet("{id:int}")]
     public async Task<ActionResult<CategoryDetailsDto>> GetCategoryById(int id)
     {
@@ -52,11 +54,11 @@ public class CategoriesController : ControllerBase
         return Ok(category.ToDetailsDto());
     }
 
-    
+    // POST /api/categories
     [HttpPost]
     public async Task<ActionResult<CategoryDto>> CreateCategory([FromBody] CategoryCreateDto dto)
     {
-        var baseSlug = Slugify.Generate(dto.Name);
+        var baseSlug = Slugify(dto.Name);
         var uniqueSlug = baseSlug;
         var i = 2;
         while (await _db.Categories.AnyAsync(c => c.Slug == uniqueSlug))
@@ -68,16 +70,17 @@ public class CategoriesController : ControllerBase
         var category = new Category
         {
             Name = dto.Name,
+            Image = dto.Image,
             Slug = uniqueSlug
         };
 
         _db.Categories.Add(category);
         await _db.SaveChangesAsync();
 
-        var resultDto = category.ToDto();
-        return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, resultDto);
+        return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category.ToDto());
     }
 
+    // DELETE /api/categories/{id}
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteCategory(int id)
     {
@@ -88,5 +91,25 @@ public class CategoriesController : ControllerBase
         _db.Categories.Remove(category);
         await _db.SaveChangesAsync();
         return NoContent();
+    }
+
+    private static string Slugify(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+        var normalized = value.Trim().ToLowerInvariant().Normalize(NormalizationForm.FormD);
+        var sb = new StringBuilder();
+        foreach (var c in normalized)
+        {
+            var uc = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (uc != UnicodeCategory.NonSpacingMark)
+            {
+                var ch = c;
+                if (char.IsLetterOrDigit(ch)) sb.Append(ch);
+                else if (char.IsWhiteSpace(ch) || ch == '-' || ch == '_' || ch == '+') sb.Append('-');
+            }
+        }
+        var slug = sb.ToString().Normalize(NormalizationForm.FormC);
+        while (slug.Contains("--")) slug = slug.Replace("--", "-");
+        return slug.Trim('-');
     }
 }
