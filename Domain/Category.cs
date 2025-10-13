@@ -8,5 +8,7 @@ public class Category
 
    public string Slug { get; set; } = string.Empty;
 
+   public string? Image { get; set; }
+
    public List<Product> Products { get; set; } = new();
 }
