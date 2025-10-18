@@ -20,7 +20,7 @@ public class ProductsController : ControllerBase
         _db = db;
     }
 
-    // GET /api/products and GET /api/products?slug=foo
+    
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts([FromQuery] string? slug)
     {
@@ -38,7 +38,7 @@ public class ProductsController : ControllerBase
         return Ok(products.Select(p => p.ToDto()));
     }
 
-    // GET /api/products/{id}
+    
     [HttpGet("{id:int}")]
     public async Task<ActionResult<ProductDto>> GetProductById(int id)
     {
@@ -52,11 +52,11 @@ public class ProductsController : ControllerBase
         return Ok(product.ToDto());
     }
 
-    // POST /api/products
+    
     [HttpPost]
     public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] ProductCreateDto dto)
     {
-        // [ApiController] handles basic validation (400) for required fields.
+        
         var baseSlug = Slugify(dto.Name);
         var uniqueSlug = baseSlug;
         var i = 2;
@@ -75,7 +75,7 @@ public class ProductsController : ControllerBase
             UrlSlug = uniqueSlug
         };
 
-        // Attach categories if provided
+        
         if (dto.Categories?.Count > 0)
         {
             var cats = await _db.Categories
@@ -91,7 +91,7 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, resultDto);
     }
 
-    // DELETE /api/products/{id}
+    
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
@@ -120,7 +120,7 @@ public class ProductsController : ControllerBase
             }
         }
         var slug = sb.ToString().Normalize(NormalizationForm.FormC);
-        // collapse multiple dashes
+        
         while (slug.Contains("--")) slug = slug.Replace("--", "-");
         return slug.Trim('-');
     }

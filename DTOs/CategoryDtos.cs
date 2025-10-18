@@ -9,7 +9,7 @@ public record CategoryDto(
     string? Image
 );
 
-// Used for /api/categories (list) and /api/categories?slug=
+
 public record CategoryWithProductsDto(
     int Id,
     string Name,
@@ -17,7 +17,7 @@ public record CategoryWithProductsDto(
     List<ProductDto> Products
 );
 
-// Used for /api/categories/{id} (includes slug per spec)
+
 public record CategoryDetailsDto(
     int Id,
     string Name,
@@ -27,7 +27,7 @@ public record CategoryDetailsDto(
 );
 
 public record CategoryCreateDto(
-    [parameter: Required, MinLength(1)] string Name,
+    [property: Required, MinLength(1)] string Name,
     string? Image
 );
 

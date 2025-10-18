@@ -15,9 +15,9 @@ public record ProductDto
 
 public record ProductCreateDto
 (
-    [parameter: Required, MinLength(1)] string Name,
+    [property: Required, MinLength(1)] string Name,
     string? Description,
-    [parameter: Range(typeof(decimal), "0", "79228162514264337593543950335")] decimal Price,
+    [property: Range(typeof(decimal), "0", "79228162514264337593543950335")] decimal Price,
     string? Image,
     List<int>? Categories
 );
