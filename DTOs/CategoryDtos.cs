@@ -27,7 +27,7 @@ public record CategoryDetailsDto(
 );
 
 public record CategoryCreateDto(
-    [property: Required, MinLength(1)] string Name,
+    [param: Required, MinLength(1)] string Name,
     string? Image
 );
 
