@@ -1,4 +1,4 @@
-// csharp
+
 using System.Globalization;
 using System.Text;
 using LjudButikenBackEnd.Data;
@@ -20,7 +20,7 @@ public class CategoriesController : ControllerBase
         _db = db;
     }
 
-    // GET /api/categories and GET /api/categories?slug=foo
+    
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoryWithProductsDto>>> GetCategories([FromQuery] string? slug)
     {
@@ -39,7 +39,7 @@ public class CategoriesController : ControllerBase
         return Ok(categories.Select(c => c.ToWithProductsDto()));
     }
 
-    // GET /api/categories/{id}
+    
     [HttpGet("{id:int}")]
     public async Task<ActionResult<CategoryDetailsDto>> GetCategoryById(int id)
     {
@@ -80,7 +80,7 @@ public class CategoriesController : ControllerBase
         return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category.ToDto());
     }
 
-    // DELETE /api/categories/{id}
+    
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteCategory(int id)
     {
